@@ -1,0 +1,5 @@
+Логи микросервисов:
+docker compose logs monolith
+docker compose logs movies-service
+docker compose logs events-service
+docker compose logs proxy-service

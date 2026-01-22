@@ -1,0 +1,13 @@
+Зависимости: pip install fastapi uvicorn httpx
+
+- Переменные окружения
+- Health-check
+- Маршрутизация по /api/...
+- Пплавная миграция (GRADUAL_MIGRATION + MOVIES_MIGRATION_PERCENT)
+- Логирование
+- Обратный прокси с заголовками
+
+Используется httpx.AsyncClient для асинхронного проксирования.
+Добавляются заголовки X-Forwarded-* и X-Origin-Host.
+Обработка ошибок: 503 Service Unavailable при недоступности сервиса.
+Логика маршрутизации (/api/movies, /api/events) упрощена через str.startswith.

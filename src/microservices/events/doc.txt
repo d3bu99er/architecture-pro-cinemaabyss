@@ -1,0 +1,17 @@
+Зависимости: pip install fastapi uvicorn aiokafka python-dotenv
+
+Стек:
+FastAPI — для HTTP API (лёгкий, асинхронный, современный),
+Aiokafka — для асинхронной работы с Kafka,
+Внутреннее in-memory хранилище событий (с ограничением до 50 последних),
+Потокобезопасность через asyncio.Lock и корректную работу с состоянием.
+
+Функциональность:
+Чтение KAFKA_BROKERS, PORT из env
+In-memory хранилище (max 50 событий)
+Автоматическая генерация id и timestamp
+Публикация в Kafka с fallback на локальное хранение
+Обработка событий (user, movie, payment) с логированием
+Эндпоинты: /health, /api/events, /api/events/user и др.
+Демо-события при старте
+Потокобезопасность (через asyncio.Lock)
