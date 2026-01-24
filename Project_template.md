@@ -58,11 +58,11 @@
 Необходимые тесты для проверки этого API вызываются при запуске npm run test:local из папки tests/postman
 
 Cкриншот тестов и скриншот состояния топиков Kafka http://localhost:8090:
-![NPM run tests:local](.\screenshots\npm_run_test-local.jpg)
+![NPM run tests:local](./screenshots/npm_run_test-local.jpg)
 
-![Kafka index UI](.\screenshots\kafka_ui1.jpg)
-![Kafka brokers](.\screenshots\kafka_brokers.jpg)
-![Kafka topics](.\screenshots\kafka_topics.jpg)
+![Kafka index UI](./screenshots/kafka_ui1.jpg)
+![Kafka brokers](./screenshots/kafka_brokers.jpg)
+![Kafka topics](./screenshots/kafka_topics.jpg)
 
 
 ## Задание 3
@@ -115,7 +115,7 @@ jobs:
 Как только сборка отработает и в github registry появятся ваши образы, можно переходить к блоку настройки Kubernetes
 Успешным результатом данного шага является "зеленая" сборка и "зеленые" тесты:
 
-![CI TESTS](.\screenshots\CI_executed_tests.jpg)
+![CI TESTS](./screenshots/CI_executed_tests.jpg)
 
 
 ### Proxy в Kubernetes
@@ -277,15 +277,15 @@ cat .docker/config.json | base64
   ```
   Часть тестов с health-чек упадет, но создание событий отработает.
   Откройте логи event-service и сделайте скриншот обработки событий:
-  ![ALL Namespaces](.\screenshots\kubectl_all_namespaces.jpg)
-  ![Kuber TESTS](.\screenshots\test-kubernetes.png)
-  ![Events](.\screenshots\logs_after_kubertests.jpg)
+  ![ALL Namespaces](./screenshots/kubectl_all_namespaces.jpg)
+  ![Kuber TESTS](./screenshots/test-kubernetes.png)
+  ![Events](./screenshots/logs_after_kubertests.jpg)
 
 
 #### Шаг 3
 Добавьте сюда скриншота вывода при вызове https://cinemaabyss.example.com/api/movies и  скриншот вывода event-service после вызова тестов:
-![Movies](.\screenshots\cinemaabyss.example.com.png)
-![Events](.\screenshots\logs_after_kubertests.jpg)
+![Movies](./screenshots/cinemaabyss.example.com.png)
+![Events](./screenshots/logs_after_kubertests.jpg)
 
 
 ## Задание 4
@@ -361,7 +361,7 @@ minikube tunnel
 Потом вызовите 
 https://cinemaabyss.example.com/api/movies
 и приложите скриншот развертывания helm и вывода https://cinemaabyss.example.com/api/movies:
-![Kuber TESTS](.\screenshots\helm_installed_and_working.jpg)
+![Kuber TESTS](./screenshots/helm_installed_and_working.jpg)
 
 
 # Задание 5
@@ -428,8 +428,8 @@ You can see 21 for the upstream_rq_pending_overflow value which means 21 calls s
 ```
 
 Приложите скриншот работы circuit breaker'а:
-![Kuber TESTS](.\screenshots\fortio_test.jpg)
-![Kuber TESTS](.\screenshots\fortio_test_2.jpg)
+![Kuber TESTS](./screenshots/fortio_test.jpg)
+![Kuber TESTS](./screenshots/fortio_test_2.jpg)
 
 Удаляем все
 ```bash
