@@ -20,9 +20,11 @@ spec:
       labels:
         app: monolith
     spec:
+      imagePullSecrets:
+      - name: dockerconfigjson
       containers:
       - name: monolith
-        image:  ghcr.io/db-exp/cinemaabysstest/monolith:latest
+        image: ghcr.io/d3bu99er/architecture-pro-cinemaabyss/monolith:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
@@ -56,8 +58,6 @@ spec:
           initialDelaySeconds: 15
           periodSeconds: 20
       restartPolicy: Always
-      imagePullSecrets:
-        - name: dockerconfigjson
 ---
 apiVersion: v1
 kind: Service

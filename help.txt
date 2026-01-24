@@ -3,3 +3,18 @@ docker compose logs monolith
 docker compose logs movies-service
 docker compose logs events-service
 docker compose logs proxy-service
+
+Применить все манифесты в kuber:
+kubectl apply -f src/kubernetes/
+
+Нагрузочное тестирование с fortio:
+# 1. Применить обновлённый CB-конфиг
+kubectl apply -f ./src/kubernetes/circuit-breaker-config.yaml -n cinemaabyss
+# 2. Убедиться, что Fortio есть
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.25/samples/httpbin/sample-client/fortio-deploy.yaml -n cinemaabyss
+# 3. Получить имя
+FORTIO_POD=$(kubectl get pod -n cinemaabyss | grep fortio | awk '{print $1}')
+# 4. Запустить тест
+kubectl exec -n cinemaabyss $FORTIO_POD -c fortio -- fortio load -c 50 -qps 0 -n 500 -loglevel Warning http://movies-service:8081/api/movies
+# 5. Проверить overflow
+kubectl exec -n cinemaabyss $FORTIO_POD -c istio-proxy -- pilot-agent request GET stats | grep movies-service | grep pending

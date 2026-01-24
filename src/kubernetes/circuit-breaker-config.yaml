@@ -1,0 +1,152 @@
+---
+# Circuit Breaker for Monolith Service
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: monolith-circuit-breaker
+  namespace: cinemaabyss
+spec:
+  host: monolith
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 10
+      http:
+        http1MaxPendingRequests: 10
+        maxRequestsPerConnection: 2
+    outlierDetection:
+      consecutiveErrors: 3
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+      minHealthPercent: 30
+
+---
+# Circuit Breaker for Movies Service
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: movies-service-circuit-breaker
+  namespace: cinemaabyss
+spec:
+  host: movies-service
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 10
+      http:
+        http1MaxPendingRequests: 10
+        maxRequestsPerConnection: 2
+    outlierDetection:
+      consecutiveErrors: 3
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+      minHealthPercent: 30
+
+# ---
+# # Virtual Service for Monolith with Retry Policy
+# apiVersion: networking.istio.io/v1alpha3
+# kind: VirtualService
+# metadata:
+#   name: monolith-vs
+#   namespace: cinemaabyss
+# spec:
+#   hosts:
+#   - monolith
+#   http:
+#   - match:
+#     - uri:
+#         prefix: /
+#     route:
+#     - destination:
+#         host: monolith
+#     retries:
+#       attempts: 3
+#       perTryTimeout: 2s
+#       retryOn: 5xx,reset,connect-failure,refused-stream
+#     timeout: 10s
+
+# ---
+# # Virtual Service for Movies Service with Retry Policy
+# apiVersion: networking.istio.io/v1alpha3
+# kind: VirtualService
+# metadata:
+#   name: movies-service-vs
+#   namespace: cinemaabyss
+# spec:
+#   hosts:
+#   - movies-service
+#   http:
+#   - match:
+#     - uri:
+#         prefix: /
+#     route:
+#     - destination:
+#         host: movies-service
+#     retries:
+#       attempts: 3
+#       perTryTimeout: 2s
+#       retryOn: 5xx,reset,connect-failure,refused-stream
+#     timeout: 10s
+
+# ---
+# # Gateway for external access
+# apiVersion: networking.istio.io/v1alpha3
+# kind: Gateway
+# metadata:
+#   name: cinemaabyss-gateway
+#   namespace: cinemaabyss
+# spec:
+#   selector:
+#     istio: ingressgateway
+#   servers:
+#   - port:
+#       number: 80
+#       name: http
+#       protocol: HTTP
+#     hosts:
+#     - cinemaabyss.example.com
+
+# ---
+# # Virtual Service for external traffic
+# apiVersion: networking.istio.io/v1alpha3
+# kind: VirtualService
+# metadata:
+#   name: cinemaabyss-external-vs
+#   namespace: cinemaabyss
+# spec:
+#   hosts:
+#   - cinemaabyss.example.com
+#   gateways:
+#   - cinemaabyss-gateway
+#   http:
+#   - match:
+#     - uri:
+#         prefix: /api/events
+#     route:
+#     - destination:
+#         host: events-service
+#         port:
+#           number: 8082
+#   - match:
+#     - uri:
+#         prefix: /api/movies
+#     route:
+#     - destination:
+#         host: movies-service
+#         port:
+#           number: 8081
+#     fault:
+#       delay:
+#         percentage:
+#           value: 0.1
+#         fixedDelay: 5s
+#   - match:
+#     - uri:
+#         prefix: /
+#     route:
+#     - destination:
+#         host: proxy-service
+#         port:
+#           number: 8000
