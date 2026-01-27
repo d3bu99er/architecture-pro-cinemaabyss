@@ -12,10 +12,10 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  MONOLITH_IMAGE_NAME: ${{ github.repository }}/monolith
-  MOVIES_SERVICE_IMAGE_NAME: ${{ github.repository }}/movies-service
-  EVENTS_SERVICE_IMAGE_NAME: ${{ github.repository }}/events-service
-  PROXY_SERVICE_IMAGE_NAME: ${{ github.repository }}/proxy-service
+  MONOLITH_IMAGE_NAME: ${{ github.repository_owner }}/monolith
+  MOVIES_SERVICE_IMAGE_NAME: ${{ github.repository_owner }}/movies-service
+  EVENTS_SERVICE_IMAGE_NAME: ${{ github.repository_owner }}/events-service
+  PROXY_SERVICE_IMAGE_NAME: ${{ github.repository_owner }}/proxy-service
 
 jobs:
   build-and-push:
