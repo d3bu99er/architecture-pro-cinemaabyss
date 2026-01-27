@@ -9,7 +9,7 @@ RUN apt-get update && \
 
 COPY requirements.txt .
 
-# Устанавливаем зависимости в системный site-packages
+# Устанавливаем зависимости в системный site-packages!
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Копируем приложение
