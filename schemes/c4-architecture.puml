@@ -1,0 +1,108 @@
+@startuml
+!include <C4/C4_Container>
+
+title КиноБездна (to-be) Диаграмма контейнеров
+Person(user, "Пользователь", "Получает контент в браузере, мобильном приложении и ТВ")
+Person(admin, "Администратор", "Управляет контентом/пользователями")
+
+System_Ext(payment_systems, "Платёжные провайдеры", "Внешний сервис обработки платежей ЮКасса/CloudPayments/Сбербанк Онлайн‑эквайринг")
+System_Ext(recommendation_system, "Рекомендательная система", "Рекомендации на основе ML анализа")
+System_Ext(content_providers, "Внешний источник контента", "CDN или стриминговый сервис")
+
+Container(mobile_app, "Мобильный клиент", "React Native", "Мобильное приложение")
+Container(web_app, "Веб-клиент", "React SPA", "Веб-интерфейс")
+Container(smart_tv_app, "TV-клиент", "TV OS", "Приложение для телевизоров")
+
+System_Boundary(cinema_system, "SaaS CinemaAbyss") {
+
+    Container(monolith, "Монолит", "Go", "Исходное приложение подвергаемое разделению")
+
+    Container(api_gateway, "API Gateway", "Python/FastAPI", "Маршрутизация запросов")
+    Container(user_service, "Сервис пользователей", "Python", "Регистрация и аутентификация")
+    Container(movies_service, "Сервис фильмов", "Python", "Метаданные и поиск фильмов")
+    Container(payment_service, "Сервис платежей", "Python", "Обработка платежей")
+    Container(subscription_service, "Сервис подписок", "Python", "Управление подписками")
+    Container(events_service, "Сервис событий", "Python", "Обработка событий")
+
+    Container(kafka, "Apache Kafka", "Kafka 2.7", "Очереди сообщений")
+    Container(kafka_ui, "Kafka UI", "Web UI", "Мониторинг Kafka")
+    ContainerDb(postgres, "PostgreSQL", "PostgreSQL 14", "База данных")
+
+    Container(grafana, "Grafana", "Визуализация", "Дашборды")
+    Container(prometheus, "Prometheus", "Мониторинг", "Сбор метрик")
+}
+
+System_Boundary(infrastructure, "Инфраструктура и DevOps") {
+    Container(k8s_cluster, "Kubernetes", "K8s", "Оркестрация контейнеров")
+    Container(helm, "Helm", "Helm", "Менеджер пакетов")
+    Container(ci_cd, "GitHub CI/CD", "Actions", "Автоматизация развёртывания")
+    Container(docker_registry, "Docker Registry", "GitHub Registry", "Хранилище образов")
+}
+
+' ВЗАИМОДЕЙСТВИЕ ПОЛЬЗОВАТЕЛЕЙ
+Rel(admin, web_app, "Использует", "HTTPS")
+Rel(user, mobile_app, "Использует", "HTTPS")
+Rel(user, web_app, "Использует", "HTTPS")
+Rel(user, smart_tv_app, "Использует", "HTTPS")
+
+' КЛИЕНТЫ К API GATEWAY
+Rel(mobile_app, api_gateway, "API вызовы", "REST")
+Rel(web_app, api_gateway, "API вызовы", "REST")
+Rel(smart_tv_app, api_gateway, "API вызовы", "REST")
+
+' МАРШРУТИЗАЦИЯ API GATEWAY
+Rel(api_gateway, user_service, "Запросы пользователей", "REST")
+Rel(api_gateway, movies_service, "Запросы фильмов", "REST")
+Rel(api_gateway, payment_service, "Запросы платежей", "REST")
+Rel(api_gateway, subscription_service, "Запросы подписок", "REST")
+Rel(api_gateway, monolith, "Запросы монолита", "REST")
+
+' ВЗАИМОДЕЙСТВИЕ С БД
+Rel(user_service, postgres, "Данные пользователей", "SQL")
+Rel(movies_service, postgres, "Данные фильмов", "SQL")
+Rel(payment_service, postgres, "Данные платежей", "SQL")
+Rel(subscription_service, postgres, "Данные подписок", "SQL")
+Rel(monolith, postgres, "Данные монолита", "SQL")
+
+' ОБМЕН СОБЫТИЯМИ
+Rel(user_service, kafka, "События пользователей", "Kafka")
+Rel(movies_service, kafka, "События фильмов", "Kafka")
+Rel(payment_service, kafka, "События платежей", "Kafka")
+Rel(subscription_service, kafka, "События подписок", "Kafka")
+Rel(events_service, kafka, "Обработка событий", "Kafka")
+
+' МОНИТОРИНГ KAFKA
+Rel(kafka_ui, kafka, "Мониторинг", "Admin API")
+
+' СБОР МЕТРИК
+Rel(prometheus, user_service, "Метрики", "HTTP")
+Rel(prometheus, movies_service, "Метрики", "HTTP")
+Rel(prometheus, payment_service, "Метрики", "HTTP")
+Rel(prometheus, subscription_service, "Метрики", "HTTP")
+Rel(prometheus, events_service, "Метрики", "HTTP")
+Rel(prometheus, monolith, "Метрики", "HTTP")
+Rel(prometheus, kafka, "Метрики", "HTTP")
+Rel(prometheus, postgres, "Метрики", "HTTP")
+Rel(grafana, prometheus, "Запросы метрик", "HTTP")
+
+' ВНЕШНИЕ ИНТЕГРАЦИИ
+Rel(payment_service, payment_systems, "Обработка платежей", "API")
+Rel(movies_service, recommendation_system, "Рекомендации", "API")
+Rel(movies_service, content_providers, "Метаданные", "API")
+
+' ИНФРАСТРУКТУРА
+Rel(k8s_cluster, user_service, "Оркестрация", "K8s")
+Rel(k8s_cluster, movies_service, "Оркестрация", "K8s")
+Rel(k8s_cluster, payment_service, "Оркестрация", "K8s")
+Rel(k8s_cluster, subscription_service, "Оркестрация", "K8s")
+Rel(k8s_cluster, events_service, "Оркестрация", "K8s")
+Rel(k8s_cluster, api_gateway, "Оркестрация", "K8s")
+Rel(k8s_cluster, postgres, "Оркестрация", "K8s")
+Rel(k8s_cluster, kafka, "Оркестрация", "K8s")
+Rel(k8s_cluster, prometheus, "Оркестрация", "K8s")
+Rel(k8s_cluster, grafana, "Оркестрация", "K8s")
+
+Rel(helm, k8s_cluster, "Развёртывание", "K8s")
+Rel(ci_cd, docker_registry, "Загрузка образов", "Docker")
+Rel(k8s_cluster, docker_registry, "Скачивание образов", "Docker")
+@enduml

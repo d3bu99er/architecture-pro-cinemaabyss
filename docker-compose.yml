@@ -16,9 +16,10 @@ services:
       - ./src/database/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
+      interval: 20s # Увеличил с 10 до 20
       timeout: 5s
       retries: 5
+      start_period: 40s # Задаю льготный период
     networks:
       - cinemaabyss-network
 
@@ -57,7 +58,8 @@ services:
       dockerfile: Dockerfile
     container_name: cinemaabyss-monolith
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy # Добавил ожидание healthcheck postgres после всего
     ports:
       - "8080:8080"
     environment:
@@ -89,8 +91,10 @@ services:
       dockerfile: Dockerfile
     container_name: cinemaabyss-events-service
     depends_on:
-      - postgres
-      - kafka
+      postgres:
+        condition: service_healthy # Добавил ожидание healthcheck postgres после всего
+      kafka:
+        condition: service_started # Добавил ожидание старта kafka
     ports:
       - "8082:8082"
     environment:
