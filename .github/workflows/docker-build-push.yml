@@ -3,17 +3,19 @@ name: Docker Build and Push
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [ main, cinema ]
     paths:
       - 'src/**'
       - '.github/workflows/docker-build-push.yml'
+  pull_request:
+    branches: [ main, cinema ]
   release:
     types: [published]
 
 env:
   REGISTRY: ghcr.io
   MONOLITH_IMAGE_NAME: ${{ github.repository_owner }}/monolith
-  MOVIES_SERVICE_IMAGE_NAME: ${{ github.repository_owner}}/movies-service
+  MOVIES_SERVICE_IMAGE_NAME: ${{ github.repository_owner }}/movies-service
   EVENTS_SERVICE_IMAGE_NAME: ${{ github.repository_owner }}/events-service
   PROXY_SERVICE_IMAGE_NAME: ${{ github.repository_owner }}/proxy-service
 
